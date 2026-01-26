@@ -42,3 +42,47 @@ habit-tracker/
 ├── backend/
 │   ├── api/               # API endpoints handling log requests
 │   ├── auth/              # Server-side user session management
+│   └── config.php         # Relational database connection pooling
+└── frontend/
+    ├── src/               # React components, hooks, and dashboard layouts
+    ├── package.json       # Dependencies and compilation scripts
+    └── tailwind.config.js # Custom Tailwind CSS design parameters
+
+<!-- rev 0 -->
+<!-- rev 1 -->
+<!-- rev 2 -->
+<!-- rev 3 -->
+<!-- rev 4 -->
+<!-- rev 5 -->
+<!-- rev 6 -->
+<!-- rev 7 -->
+<!-- rev 8 -->
+<!-- rev 9 -->
+<!-- rev 10 -->
+<!-- rev 11 -->
+<!-- rev 12 -->
+<!-- rev 13 -->
+<!-- rev 14 -->
+<!-- rev 15 -->
+<!-- rev 16 -->
+<!-- rev 17 -->
+<!-- rev 18 -->
+<!-- rev 19 -->
+<!-- rev 20 -->
+<!-- rev 21 -->
+<!-- rev 22 -->
+<!-- rev 23 -->
+<!-- rev 24 -->
+<!-- rev 25 -->
+<!-- rev 26 -->
+<!-- rev 27 -->
+<!-- rev 28 -->
+<!-- rev 29 -->
+<!-- refactoring phase 31 -->
+<!-- refactoring phase 32 -->
+<!-- refactoring phase 33 -->
+<!-- refactoring phase 34 -->
+<!-- refactoring phase 35 -->
+<!-- refactoring phase 36 -->
+<!-- refactoring phase 37 -->
+<!-- refactoring phase 38 -->
