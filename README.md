@@ -33,3 +33,38 @@ The application is built using a reliable full-stack architecture designed to ha
 
 ---
 
+## 📁 Repository Structure
+
+```text
+habit-tracker/
+├── database/
+│   └── schema.sql         # Optimized database schema definition
+├── backend/
+│   ├── api/               # API endpoints handling log requests
+│   ├── auth/              # Server-side user session management
+│   └── config.php         # Relational database connection pooling
+└── frontend/
+    ├── src/               # React components, hooks, and dashboard layouts
+    ├── package.json       # Dependencies and compilation scripts
+    └── tailwind.config.js # Custom Tailwind CSS design parameters
+
+<!-- rev 0 -->
+<!-- rev 1 -->
+<!-- rev 2 -->
+<!-- rev 3 -->
+<!-- rev 4 -->
+<!-- rev 5 -->
+<!-- rev 6 -->
+<!-- rev 7 -->
+<!-- rev 8 -->
+<!-- rev 9 -->
+<!-- rev 10 -->
+<!-- rev 11 -->
+<!-- rev 12 -->
+<!-- rev 13 -->
+<!-- rev 14 -->
+<!-- rev 15 -->
+<!-- rev 16 -->
+<!-- rev 17 -->
+<!-- rev 18 -->
+<!-- rev 19 -->
