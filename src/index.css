@@ -1,0 +1,5 @@
+@import "tailwindcss"; /* If using Tailwind v4 */
+/* OR if using v3: */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
