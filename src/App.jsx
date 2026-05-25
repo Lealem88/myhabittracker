@@ -70,3 +70,75 @@ export default function App() {
     osc.type = 'sine';
     osc.frequency.setValueAtTime(523.25, audioCtx.current.currentTime);
     osc.frequency.exponentialRampToValueAtTime(880, audioCtx.current.currentTime + 0.1);
+    gain.gain.setValueAtTime(0, audioCtx.current.currentTime);
+    gain.gain.linearRampToValueAtTime(0.2, audioCtx.current.currentTime + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.current.currentTime + 0.3);
+    osc.connect(gain); gain.connect(audioCtx.current.destination);
+    osc.start(); osc.stop(audioCtx.current.currentTime + 0.3);
+  };
+
+  // --- ACTIONS ---
+  const handleSaveHabit = () => {
+    if (!formState.title || !formState.goal) return;
+    const isDuplicate = habits.some(h => h.title.toLowerCase().trim() === formState.title.toLowerCase().trim() && h.id !== editingHabitId);
+    if (isDuplicate) { alert("You already have this habit!"); return; }
+
+    if (editingHabitId) setHabits(prev => prev.map(h => h.id === editingHabitId ? { ...h, ...formState } : h));
+    else setHabits([...habits, { ...formState, id: Date.now(), history: {}, color: formState.color || 'bg-rose-50', progressColor: formState.progressColor || 'bg-rose-500' }]);
+    closeModal();
+  };
+
+  const updateProgress = (id, val) => {
+    setHabits(prev => prev.map(h => {
+      if (h.id === id) {
+        const oldProgress = h.history[dateKey] || 0;
+        if (oldProgress < h.goal && val >= h.goal) playSuccessSound();
+        return { ...h, history: { ...h.history, [dateKey]: val } };
+      }
+      return h;
+    }));
+  };
+
+  const closeModal = () => { setIsFormOpen(false); setEditingHabitId(null); setFormState({ title: '', goal: '', unit: '', icon: '🎯' }); setSearchQuery(''); };
+  const deleteHabit = (id) => { if (window.confirm("Delete this habit?")) setHabits(habits.filter(h => h.id !== id)); };
+
+  const getDailyCompletion = (dateObj = selectedDate) => {
+    if (habits.length === 0) return 0;
+    const key = format(dateObj, 'yyyy-MM-dd');
+    let total = 0;
+    habits.forEach(h => total += Math.min((h.history[key] || 0) / h.goal, 1));
+    return Math.round((total / habits.length) * 100);
+  };
+
+  const filteredHabits = useMemo(() => habits.filter(h => {
+    const done = (h.history[dateKey] || 0) >= h.goal;
+    return filter === 'completed' ? done : filter === 'in-progress' ? !done : true;
+  }), [habits, filter, dateKey]);
+
+  return (
+    <div className={`max-w-md mx-auto min-h-screen pb-40 font-sans border-x shadow-2xl relative transition-colors duration-300 ${theme === 'dark' ? 'bg-[#121212] text-white' : 'bg-[#FBFBFE] text-[#1A1C1E]'}`}>
+      
+      {/* HEADER */}
+      {view !== 'settings' && (
+        <header className={`${theme === 'dark' ? 'bg-[#121212]' : 'bg-white/80'} px-6 pt-8 pb-4 backdrop-blur-md sticky top-0 z-40 border-b border-gray-50`}>
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h1 className="text-2xl font-black italic">{format(selectedDate, 'MMMM d')}</h1>
+              <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest">{getDailyCompletion()}% COMPLETE</p>
+            </div>
+            {!isToday(selectedDate) && (
+              <button onClick={() => { setWeekOffset(0); setSelectedDate(new Date()); }} className="text-[9px] font-black bg-rose-50 text-rose-500 px-3 py-1 rounded-full border border-rose-100 animate-bounce">GO TO TODAY</button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 mb-6">
+            <button onClick={() => setWeekOffset(prev => prev - 1)} className="p-1 text-gray-400"><ChevronLeft size={18} /></button>
+            <div className={`flex-1 flex justify-between items-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50/80'} p-1 rounded-2xl border border-gray-100`}>
+              {[...Array(7)].map((_, i) => {
+                const day = addDays(currentWeekStart, i);
+                const active = isSameDay(day, selectedDate);
+                return (
+                  <button key={i} onClick={() => setSelectedDate(day)} className={`flex flex-col items-center flex-1 py-3 rounded-xl transition-all ${active ? 'bg-white shadow-sm scale-105' : 'opacity-40'}`}>
+                    <span className={`text-[8px] font-black uppercase mb-1 ${active ? 'text-rose-500' : 'text-gray-400'}`}>{format(day, 'eee')}</span>
+                    <span className={`text-sm font-black ${active && theme === 'dark' ? 'text-black' : ''}`}>{format(day, 'd')}</span>
+                  </button>
