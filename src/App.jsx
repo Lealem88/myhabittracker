@@ -142,3 +142,75 @@ export default function App() {
                     <span className={`text-[8px] font-black uppercase mb-1 ${active ? 'text-rose-500' : 'text-gray-400'}`}>{format(day, 'eee')}</span>
                     <span className={`text-sm font-black ${active && theme === 'dark' ? 'text-black' : ''}`}>{format(day, 'd')}</span>
                   </button>
+                );
+              })}
+            </div>
+            <button onClick={() => setWeekOffset(prev => prev + 1)} className="p-1 text-gray-400"><ChevronRight size={18} /></button>
+          </div>
+
+          {view === 'home' && (
+            <div className="flex gap-2">
+              {['all', 'in-progress', 'completed'].map(f => (
+                <button key={f} onClick={() => setFilter(f)} className={`flex-1 py-2 rounded-xl text-[9px] font-black uppercase border transition-all ${filter === f ? 'bg-[#1A1C1E] text-white' : 'bg-transparent text-gray-400 border-gray-100'}`}>{f}</button>
+              ))}
+            </div>
+          )}
+        </header>
+      )}
+
+      {/* HOME LIST */}
+      {view === 'home' && (
+        <main className="p-6 space-y-4">
+          {filteredHabits.map((h) => {
+            const progress = h.history[dateKey] || 0;
+            const isDone = progress >= h.goal;
+            const currentStreak = calculateStreak(h);
+            return (
+              <div key={h.id} className={`relative ${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} p-5 rounded-[2.5rem] shadow-sm border flex items-center justify-between group overflow-hidden`}>
+                <div className="flex items-center gap-4 z-10">
+                  <div className={`w-12 h-12 rounded-2xl ${h.color} flex items-center justify-center text-xl`}>{isDone ? '✨' : h.icon}</div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                        <h4 className="font-black text-sm">{h.title}</h4>
+                        {currentStreak > 0 && <span className="text-[10px] font-black text-orange-500 flex items-center gap-0.5">🔥{currentStreak}</span>}
+                    </div>
+                    {editingProgressId === h.id ? (
+                      <input 
+                        autoFocus type="number" 
+                        className="w-20 border-b-2 border-rose-500 outline-none text-xs font-bold bg-transparent"
+                        onChange={(e) => updateProgress(h.id, parseFloat(e.target.value) || 0)}
+                        onBlur={() => setEditingProgressId(null)}
+                      />
+                    ) : (
+                      <p onClick={() => setEditingProgressId(h.id)} className="text-[10px] font-bold text-gray-400 cursor-text uppercase">{progress} / {h.goal} {h.unit}</p>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2 z-10">
+                  <button onClick={() => setEditingProgressId(h.id)} className="w-9 h-9 rounded-full bg-gray-50/10 flex items-center justify-center text-rose-500"><Plus size={16} /></button>
+                  <button onClick={() => {setFormState(h); setEditingHabitId(h.id); setIsFormOpen(true);}} className="w-9 h-9 rounded-full bg-gray-50/10 flex items-center justify-center text-gray-400 opacity-0 group-hover:opacity-100 transition-all"><Edit3 size={14} /></button>
+                  <button onClick={() => deleteHabit(h.id)} className="w-9 h-9 rounded-full bg-gray-50/10 flex items-center justify-center text-gray-300 opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={14} /></button>
+                </div>
+                <div className={`absolute left-0 top-0 h-full ${h.progressColor} opacity-10 transition-all duration-700 ease-out`} style={{ width: `${Math.min((progress/h.goal)*100, 100)}%` }} />
+              </div>
+            );
+          })}
+        </main>
+      )}
+
+      {/* STATS VIEW */}
+      {view === 'stats' && (
+        <main className="p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <h2 className="text-2xl font-black italic mb-8 text-center">Analytics</h2>
+          <div className={`${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-50'} rounded-[3rem] p-10 flex flex-col items-center border shadow-sm mb-6`}>
+             <div className="w-40 h-40 rounded-full border-[12px] border-rose-50 flex flex-col items-center justify-center relative">
+                <svg className="absolute inset-[-12px] w-[184px] h-[184px] transform -rotate-90">
+                  <circle cx="92" cy="92" r="86" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-rose-500 transition-all duration-1000 ease-in-out" strokeDasharray={540} strokeDashoffset={540 - (540 * getDailyCompletion()) / 100} strokeLinecap="round" />
+                </svg>
+                <span className="text-3xl font-black">{getDailyCompletion()}%</span>
+                <span className="text-[10px] font-black opacity-30 uppercase">Today's Goal</span>
+             </div>
+          </div>
+          <div className={`${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-50'} rounded-[3rem] p-8 border`}>
+            <div className="flex items-end justify-between h-32 gap-3">
