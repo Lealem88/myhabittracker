@@ -214,3 +214,74 @@ export default function App() {
           </div>
           <div className={`${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-50'} rounded-[3rem] p-8 border`}>
             <div className="flex items-end justify-between h-32 gap-3">
+              {[...Array(7)].map((_, i) => (
+                <div key={i} className="flex-1 bg-gray-50/20 rounded-full relative overflow-hidden h-full flex items-end">
+                  <div className="w-full bg-rose-400 rounded-full transition-all duration-1000" style={{ height: `${getDailyCompletion(addDays(currentWeekStart, i))}%` }} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* SETTINGS VIEW */}
+      {view === 'settings' && (
+        <main className={`${theme === 'dark' ? 'bg-[#121212]' : 'bg-white'} min-h-screen p-8`}>
+          <h2 className="text-2xl font-black mb-8">Settings</h2>
+          <div className="space-y-4">
+             <div onClick={() => { if(window.confirm("Clear all data?")) setHabits([]) }} className="flex justify-between p-5 bg-gray-50 rounded-2xl cursor-pointer">
+                <span className="font-bold">Habit Manager (Wipe)</span>
+                <Trash2 size={18} className="text-gray-300" />
+             </div>
+             <div onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="flex justify-between p-5 bg-gray-50 rounded-2xl cursor-pointer">
+                <span className="font-bold">Theme Toggle</span>
+                <span className="text-rose-500 font-black uppercase">{theme}</span>
+             </div>
+          </div>
+        </main>
+      )}
+
+      {/* ADD MODAL */}
+      {isFormOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end justify-center">
+          <div className={`${theme === 'dark' ? 'bg-gray-900' : 'bg-white'} w-full max-w-md rounded-t-[3rem] p-8 animate-in slide-in-from-bottom duration-300`}>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-black">{editingHabitId ? 'Edit' : 'Library'}</h2>
+              <button onClick={closeModal} className="p-2"><X size={20}/></button>
+            </div>
+            {!editingHabitId && (
+              <div className="relative mb-4">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                <input placeholder="Search habits..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full p-4 pl-12 rounded-2xl bg-gray-50 outline-none font-bold" />
+              </div>
+            )}
+            {!editingHabitId && (
+              <div className="flex gap-2 overflow-x-auto pb-6 no-scrollbar h-20">
+                {HABIT_LIBRARY.filter(h => h.title.toLowerCase().includes(searchQuery.toLowerCase())).map((s, i) => (
+                  <button key={i} onClick={() => setFormState(s)} className={`whitespace-nowrap h-12 px-5 rounded-xl border text-xs font-black ${formState.title === s.title ? 'bg-rose-500 text-white' : 'bg-gray-50'}`}>{s.icon} {s.title}</button>
+                ))}
+              </div>
+            )}
+            <div className="space-y-4">
+              <input value={formState.title} placeholder="Name" className="w-full p-4 rounded-2xl bg-gray-50 outline-none font-bold" onChange={e => setFormState({...formState, title: e.target.value})} />
+              <div className="flex gap-2">
+                <input value={formState.goal} placeholder="Goal" type="number" className="flex-1 p-4 rounded-2xl bg-gray-50 outline-none font-bold" onChange={e => setFormState({...formState, goal: parseFloat(e.target.value)})} />
+                <input value={formState.unit} placeholder="Unit" className="w-28 p-4 rounded-2xl bg-gray-50 outline-none font-bold" onChange={e => setFormState({...formState, unit: e.target.value})} />
+              </div>
+              <button onClick={handleSaveHabit} className="w-full bg-[#1A1C1E] text-white font-black py-5 rounded-2xl shadow-lg">{editingHabitId ? 'Save' : 'Add Habit'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* NAV */}
+      <nav className={`${theme === 'dark' ? 'bg-gray-900/90' : 'bg-white/80'} fixed bottom-10 left-1/2 -translate-x-1/2 w-[85%] backdrop-blur-xl rounded-[2.5rem] shadow-2xl p-3 flex justify-between items-center px-10 border z-40`}>
+        <Home onClick={() => setView('home')} className={view === 'home' ? 'text-rose-500' : 'text-gray-300'} />
+        <BarChart2 onClick={() => setView('stats')} className={view === 'stats' ? 'text-rose-500' : 'text-gray-300'} />
+        <div onClick={() => {setEditingHabitId(null); setIsFormOpen(true);}} className="bg-[#1A1C1E] p-4 rounded-full -mt-16 shadow-2xl cursor-pointer"><Plus className="text-white w-8 h-8" /></div>
+        <Users className="text-gray-300" />
+        <Settings onClick={() => setView('settings')} className={view === 'settings' ? 'text-rose-500' : 'text-gray-300'} />
+      </nav>
+    </div>
+  );
+}
